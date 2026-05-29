@@ -11,7 +11,9 @@ export default function FarmersPage() {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [form, setForm] = useState({ name: '', name_odia: '', village: '', phone: '', pond_acres: '' })
+  const [form, setForm] = useState({
+    name: '', name_odia: '', village: '', phone: '', pond_acres: ''
+  })
 
   useEffect(() => { if (profile) fetchFarmers() }, [profile])
 
@@ -58,85 +60,154 @@ export default function FarmersPage() {
   return (
     <div className="space-y-5 animate-fadeup">
 
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-white font-bold text-lg odia">ମଛୁଆ ତାଲିକା</h1>
           <p className="text-ocean-500 text-sm">Farmers List — {farmers.length} total</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary flex items-center gap-2">
+        <button
+          onClick={() => { setShowForm(true); setError('') }}
+          className="btn-primary flex items-center gap-2"
+        >
           <UserPlus className="w-4 h-4" />
           <span className="odia">ମଛୁଆ ଯୋଗ</span>
         </button>
       </div>
 
+      {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ocean-500" />
-        <input className="input pl-10" placeholder="ନାମ / ଗ୍ରାମ / ଫୋନ ଖୋଜନ୍ତୁ — Search name, village, phone"
-          value={search} onChange={e => setSearch(e.target.value)} />
+        <input
+          className="input pl-10"
+          placeholder="ନାମ / ଗ୍ରାମ / ଫୋନ ଖୋଜନ୍ତୁ — Search name, village, phone"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
       </div>
 
+      {/* Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div className="w-full max-w-md">
-            <div className="card w-full max-w-md p-6 animate-fadeup">
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <h2 className="text-white font-bold odia">ନୂଆ ମଛୁଆ ଯୋଗ</h2>
-                  <p className="text-ocean-500 text-sm">Add New Farmer</p>
-                </div>
-                <button onClick={() => setShowForm(false)} className="text-ocean-500 hover:text-ocean-300">
-                  <X className="w-5 h-5" />
-                </button>
+        <div
+          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+          onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}
+        >
+          <div className="bg-ocean-900 border border-ocean-700 rounded-2xl w-full max-w-md p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+
+            {/* Modal Header */}
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h2 className="text-white font-bold odia">ନୂଆ ମଛୁଆ ଯୋଗ</h2>
+                <p className="text-ocean-500 text-sm">Add New Farmer</p>
+              </div>
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-ocean-500 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-ocean-800"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="flex gap-2 bg-red-900/30 border border-red-800/60 rounded-xl p-3 mb-4">
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <p className="text-red-300 text-sm">{error}</p>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSave} className="space-y-4">
+              <div>
+                <label className="text-ocean-400 text-xs mb-1 block">
+                  <span className="odia">ମଛୁଆ ନାମ</span> / Farmer Name *
+                </label>
+                <input
+                  className="input"
+                  placeholder="Full name in English"
+                  value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  required
+                />
               </div>
 
-              {error && (
-                <div className="flex gap-2 bg-red-900/30 border border-red-800/60 rounded-xl p-3 mb-4">
-                  <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                  <p className="text-red-300 text-sm">{error}</p>
-                </div>
-              )}
+              <div>
+                <label className="text-ocean-400 text-xs mb-1 block">
+                  <span className="odia">ଓଡ଼ିଆ ନାମ</span> / Name in Odia
+                </label>
+                <input
+                  className="input odia"
+                  placeholder="ଓଡ଼ିଆରେ ନାମ ଲିଖନ୍ତୁ"
+                  value={form.name_odia}
+                  onChange={e => setForm({ ...form, name_odia: e.target.value })}
+                />
+              </div>
 
-              <form onSubmit={handleSave} className="space-y-4">
-                <div>
-                  <label className="label"><span className="odia">ମଛୁଆ ନାମ</span> / Farmer Name *</label>
-                  <input className="input" placeholder="Full name in English"
-                    value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
-                </div>
-                <div>
-                  <label className="label"><span className="odia">ଓଡ଼ିଆ ନାମ</span> / Name in Odia</label>
-                  <input className="input odia" placeholder="ଓଡ଼ିଆରେ ନାମ ଲିଖନ୍ତୁ"
-                    value={form.name_odia} onChange={e => setForm({...form, name_odia: e.target.value})} />
-                </div>
-                <div>
-                  <label className="label"><span className="odia">ଗ୍ରାମ</span> / Village</label>
-                  <input className="input" placeholder="Village name"
-                    value={form.village} onChange={e => setForm({...form, village: e.target.value})} />
-                </div>
-                <div>
-                  <label className="label"><span className="odia">ଫୋନ</span> / Phone</label>
-                  <input className="input" placeholder="9876543210"
-                    value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
-                </div>
-                <div>
-                  <label className="label"><span className="odia">ପୋଖରୀ ଏକର</span> / Pond Acres</label>
-                  <input className="input" type="number" step="0.01" placeholder="e.g. 2.5"
-                    value={form.pond_acres} onChange={e => setForm({...form, pond_acres: e.target.value})} />
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <button type="button" onClick={() => setShowForm(false)} className="btn-secondary flex-1">
-                    <span className="odia">ବାତିଲ</span>
-                  </button>
-                  <button type="submit" disabled={saving} className="btn-primary flex-1 flex items-center justify-center gap-2">
-                    {saving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-                    <span className="odia">ସଞ୍ଚୟ</span>
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div>
+                <label className="text-ocean-400 text-xs mb-1 block">
+                  <span className="odia">ଗ୍ରାମ</span> / Village
+                </label>
+                <input
+                  className="input"
+                  placeholder="Village name"
+                  value={form.village}
+                  onChange={e => setForm({ ...form, village: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="text-ocean-400 text-xs mb-1 block">
+                  <span className="odia">ଫୋନ</span> / Phone
+                </label>
+                <input
+                  className="input"
+                  placeholder="9876543210"
+                  type="tel"
+                  value={form.phone}
+                  onChange={e => setForm({ ...form, phone: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="text-ocean-400 text-xs mb-1 block">
+                  <span className="odia">ପୋଖରୀ ଏକର</span> / Pond Acres
+                </label>
+                <input
+                  className="input"
+                  type="number"
+                  step="0.01"
+                  placeholder="e.g. 2.5"
+                  value={form.pond_acres}
+                  onChange={e => setForm({ ...form, pond_acres: e.target.value })}
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-ocean-700 text-ocean-400 hover:bg-ocean-800 transition-all text-sm"
+                >
+                  <span className="odia">ବାତିଲ</span> / Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="flex-1 btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {saving && (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  )}
+                  <span className="odia">ସଞ୍ଚୟ</span> / Save
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
+      {/* Farmers List */}
       {loading ? (
         <div className="flex items-center justify-center h-40">
           <div className="w-8 h-8 border-4 border-ocean-500 border-t-transparent rounded-full animate-spin" />
@@ -150,14 +221,19 @@ export default function FarmersPage() {
       ) : (
         <div className="grid gap-3">
           {filtered.map(farmer => (
-            <div key={farmer.id} className="card p-4 border-ocean-700 hover:border-ocean-500 transition-all">
+            <div
+              key={farmer.id}
+              className="card p-4 border-ocean-700 hover:border-ocean-500 transition-all"
+            >
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-white font-semibold">{farmer.name}</p>
-                    {farmer.name_odia && <p className="text-ocean-400 text-sm odia">{farmer.name_odia}</p>}
+                    {farmer.name_odia && (
+                      <p className="text-ocean-400 text-sm odia">{farmer.name_odia}</p>
+                    )}
                   </div>
-                  <div className="flex items-center gap-4 mt-1.5">
+                  <div className="flex items-center gap-4 mt-1.5 flex-wrap">
                     {farmer.village && (
                       <span className="flex items-center gap-1 text-ocean-500 text-xs">
                         <MapPin className="w-3 h-3" />{farmer.village}
@@ -175,7 +251,9 @@ export default function FarmersPage() {
                     )}
                   </div>
                 </div>
-                <span className="badge-paid">Active</span>
+                <span className="text-xs bg-green-900/30 text-green-400 border border-green-800/40 px-2 py-1 rounded-lg">
+                  Active
+                </span>
               </div>
             </div>
           ))}
