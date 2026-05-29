@@ -9,6 +9,7 @@ import FarmersPage from './FarmersPage'
 import DailyRatePage from './DailyRatePage'
 import BuyersPage from './BuyersPage'
 import CollectionPage from './CollectionPage'
+import FarmerLedgerPage from './FarmerLedgerPage'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', odia: 'ଆଜିର ସ୍ଥିତି', id: 'dashboard' },
@@ -196,6 +197,7 @@ export default function Dashboard() {
           {active === 'rates' && <DailyRatePage />}
           {active === 'buyers' && <BuyersPage />}
           {active === 'collection' && <CollectionPage />}
+          {active === 'ledger' && <FarmerLedgerPage />}
 
           {active !== 'dashboard' && active !== 'farmers' && (
             <div className="animate-fadeup flex items-center justify-center h-64">
