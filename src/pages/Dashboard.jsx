@@ -62,7 +62,7 @@ export default function Dashboard() {
 
         {/* Business info */}
         <div className="px-4 py-3 border-b border-ocean-800 bg-ocean-950/30">
-          <p className="text-ocean-300 text-xs font-semibold truncate">{profile?.dealers?.name || 'ଆପଣଙ୍କ ବ୍ୟବସାୟ'}</p>
+          <p className="text-ocean-300 text-xs font-semibold truncate">{profile?.business_name || 'ଆପଣଙ୍କ ବ୍ୟବସାୟ'}</p>
           <p className="text-ocean-500 text-xs truncate">{profile?.full_name} · <span className="capitalize">{profile?.role}</span></p>
         </div>
 
