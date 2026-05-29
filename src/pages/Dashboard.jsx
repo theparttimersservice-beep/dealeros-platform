@@ -5,7 +5,7 @@ import {
   Package, Truck, TrendingUp, Receipt, BarChart3,
   Menu, X, ChevronRight
 } from 'lucide-react'
-
+import FarmersPage from './FarmersPage'
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', odia: 'ଡ୍ୟାସ୍‌ବୋର୍ଡ', id: 'dashboard' },
   { icon: Users, label: 'Farmers', odia: 'ମଛୁଆ', id: 'farmers' },
@@ -167,17 +167,19 @@ export default function Dashboard() {
             </div>
           )}
 
-          {active !== 'dashboard' && (
-            <div className="animate-fadeup flex items-center justify-center h-64">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-ocean-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  {(() => { const item = menuItems.find(m => m.id === active); return item ? <item.icon className="w-8 h-8 text-ocean-500" /> : null })()}
-                </div>
-                <p className="text-ocean-300 font-medium odia">{menuItems.find(m => m.id === active)?.odia}</p>
-                <p className="text-ocean-600 text-sm mt-1">{menuItems.find(m => m.id === active)?.label} — Coming soon</p>
-              </div>
-            </div>
-          )}
+          {active === 'farmers' && <FarmersPage />}
+
+{active !== 'dashboard' && active !== 'farmers' && (
+  <div className="animate-fadeup flex items-center justify-center h-64">
+    <div className="text-center">
+      <div className="w-16 h-16 bg-ocean-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        {(() => { const item = menuItems.find(m => m.id === active); return item ? <item.icon className="w-8 h-8 text-ocean-500" /> : null })()}
+      </div>
+      <p className="text-ocean-300 font-medium odia">{menuItems.find(m => m.id === active)?.odia}</p>
+      <p className="text-ocean-600 text-sm mt-1">{menuItems.find(m => m.id === active)?.label} — Coming soon</p>
+    </div>
+  </div>
+)}
 
         </main>
       </div>
