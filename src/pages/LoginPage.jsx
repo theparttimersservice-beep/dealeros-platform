@@ -96,7 +96,7 @@ export default function LoginPage() {
             <p className="text-ocean-500 text-sm">
               <span className="odia">ନୂଆ ବ୍ୟବସାୟ?</span> New business?{' '}
               <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium">
-                <span className="odia">ଏଠାରେ ନଥିଭୁକ୍ତ କରନ୍ତୁ</span> / Register here
+                <span className="odia">ଏଠାରେ ନାମ ପଞ୍ଜୀକୃତ କରନ୍ତୁ</span> / Register here
               </Link>
             </p>
           </div>
