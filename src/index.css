@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Mukta', sans-serif;
+    background-color: #111f3e;
+    color: #f0f4ff;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #163a76; }
+  ::-webkit-scrollbar-thumb { background: #2b84f5; border-radius: 3px; }
+}
+
+@layer components {
+  .odia { font-family: 'Tiro Odia', serif; }
+  
+  .glass {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .card {
+    @apply bg-ocean-900 border border-ocean-700 rounded-2xl;
+  }
+
+  .btn-primary {
+    @apply bg-ocean-500 hover:bg-ocean-400 text-white font-semibold px-5 py-2.5 rounded-xl
+           transition-all duration-200 shadow-lg shadow-ocean-500/20 hover:shadow-ocean-400/30
+           active:scale-95 cursor-pointer;
+  }
+
+  .btn-secondary {
+    @apply bg-ocean-900 hover:bg-ocean-800 text-ocean-200 border border-ocean-700
+           font-medium px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 cursor-pointer;
+  }
+
+  .btn-danger {
+    @apply bg-red-900/50 hover:bg-red-800/60 text-red-300 border border-red-800
+           font-medium px-5 py-2.5 rounded-xl transition-all duration-200 cursor-pointer;
+  }
+
+  .input {
+    @apply w-full bg-ocean-950 border border-ocean-700 rounded-xl px-4 py-2.5
+           text-ocean-100 placeholder-ocean-600 focus:outline-none focus:border-ocean-400
+           focus:ring-2 focus:ring-ocean-400/20 transition-all duration-200;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-ocean-300 mb-1.5;
+  }
+
+  .badge-credit {
+    @apply inline-flex items-center gap-1 bg-red-900/40 text-red-300 border border-red-800/60 
+           text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+
+  .badge-paid {
+    @apply inline-flex items-center gap-1 bg-tide-900/40 text-tide-300 border border-tide-700/60 
+           text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+
+  .badge-pending {
+    @apply inline-flex items-center gap-1 bg-sand-900/40 text-sand-300 border border-sand-700/60
+           text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+}
+
+/* Wave animation for login */
+@keyframes wave {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  25% { transform: translateX(-20px) translateY(8px); }
+  50% { transform: translateX(0) translateY(16px); }
+  75% { transform: translateX(20px) translateY(8px); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animate-fadeup { animation: fadeUp 0.5s ease forwards; }
+.animate-wave   { animation: wave 8s ease-in-out infinite; }
+
+.shimmer-text {
+  background: linear-gradient(90deg, #52a9ff 0%, #29d4b0 40%, #52a9ff 80%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
