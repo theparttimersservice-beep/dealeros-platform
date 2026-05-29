@@ -195,7 +195,7 @@ export default function Dashboard() {
           {active === 'farmers' && <FarmersPage />}
           {active === 'rates' && <DailyRatePage />}
           {active === 'buyers' && <BuyersPage />}
-          {active === 'CollectionPage' && <CollectionPage />}
+          {active === 'collection' && <CollectionPage />}
 
           {active !== 'dashboard' && active !== 'farmers' && (
             <div className="animate-fadeup flex items-center justify-center h-64">
