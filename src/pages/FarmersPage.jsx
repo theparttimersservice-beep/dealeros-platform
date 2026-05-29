@@ -79,7 +79,7 @@ export default function FarmersPage() {
 
       {/* Add Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start justify-center p-4 overflow-y-auto">
           <div className="card w-full max-w-md p-6 animate-fadeup">
             <div className="flex items-center justify-between mb-5">
               <div>
