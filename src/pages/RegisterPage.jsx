@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Eye, EyeOff, Fish, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Eye, EyeOff, Waves, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 export default function RegisterPage() {
   const { register } = useAuth()
   const [form, setForm] = useState({
-    fullName: '', dealerName: '', phone: '',
-    city: '', state: '', email: '', password: ''
+    fullName: '', businessName: '', phone: '',
+    city: '', state: 'Odisha', email: '', password: ''
   })
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -35,8 +35,8 @@ export default function RegisterPage() {
   if (success) return (
     <div className="min-h-screen bg-ocean-950 flex items-center justify-center p-4">
       <div className="card p-8 max-w-md w-full text-center animate-fadeup">
-        <div className="w-16 h-16 bg-tide-500/20 border border-tide-500/40 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle2 className="w-8 h-8 text-tide-400" />
+        <div className="w-16 h-16 bg-green-500/20 border border-green-500/40 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle2 className="w-8 h-8 text-green-400" />
         </div>
         <h2 className="text-xl font-bold text-white mb-2 odia">ନଥିଭୁକ୍ତ ସଫଳ ହୋଇଛି!</h2>
         <p className="text-ocean-400 mb-1">Registration Successful!</p>
@@ -50,17 +50,19 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-ocean-950 flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-96 h-96 bg-ocean-700/20 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-tide-700/15 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-700/20 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-700/15 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
 
       <div className="w-full max-w-lg animate-fadeup relative z-10">
+
+        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-ocean-500/20 border border-ocean-500/40 rounded-2xl mb-4">
-            <Fish className="w-8 h-8 text-ocean-400" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl mb-4 shadow-lg">
+            <Waves className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white">AquaFlow</h1>
-          <p className="odia text-ocean-400 mt-1">ନୂଆ ବ୍ୟବସାୟ ନଥିଭୁକ୍ତ</p>
-          <p className="text-ocean-500 text-sm">New Business Registration</p>
+          <h1 className="text-3xl font-bold text-white">NestNet</h1>
+          <p className="text-ocean-400 text-sm mt-1">Smart Business. Simple Management.</p>
+          <p className="odia text-ocean-500 text-sm">ନୂଆ ବ୍ୟବସାୟ ନଥିଭୁକ୍ତ</p>
         </div>
 
         <div className="card p-8">
@@ -69,7 +71,7 @@ export default function RegisterPage() {
               <span className="odia">ନଥିଭୁକ୍ତ</span>
               <span className="text-ocean-400 text-base font-normal ml-2">/ Register</span>
             </h2>
-            <p className="text-ocean-500 text-sm mt-1">ଆପଣଙ୍କ ବ୍ୟବସାୟ ବିବରଣ ଦିଅନ୍ତୁ</p>
+            <p className="text-ocean-500 text-sm mt-1 odia">ଆପଣଙ୍କ ବ୍ୟବସାୟ ବିବରଣ ଦିଅନ୍ତୁ</p>
           </div>
 
           {error && (
@@ -82,31 +84,33 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="label"><span className="odia">ବ୍ୟବସାୟ ନାମ</span> / Business Name *</label>
-              <input name="dealerName" className="input" placeholder="e.g. Sahu Fish Trading Co."
-                value={form.dealerName} onChange={handleChange} required />
+              <input name="businessName" className="input"
+                placeholder="e.g. Maa Mangala Fish Center"
+                value={form.businessName} onChange={handleChange} required />
             </div>
 
             <div>
               <label className="label"><span className="odia">ମାଲିକ ନାମ</span> / Owner Name *</label>
-              <input name="fullName" className="input" placeholder="Your full name"
+              <input name="fullName" className="input"
+                placeholder="Your full name"
                 value={form.fullName} onChange={handleChange} required />
             </div>
 
             <div>
               <label className="label"><span className="odia">ଫୋନ</span> / Phone *</label>
               <input name="phone" className="input" placeholder="9876543210"
-                value={form.phone} onChange={handleChange} required />
+                type="tel" value={form.phone} onChange={handleChange} required />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label"><span className="odia">ସହର</span> / City</label>
-                <input name="city" className="input" placeholder="e.g. Cuttack"
+                <label className="label"><span className="odia">ସହର/ଗ୍ରାମ</span> / City</label>
+                <input name="city" className="input" placeholder="e.g. Rajkanika"
                   value={form.city} onChange={handleChange} />
               </div>
               <div>
                 <label className="label"><span className="odia">ରାଜ୍ୟ</span> / State</label>
-                <input name="state" className="input" placeholder="e.g. Odisha"
+                <input name="state" className="input" placeholder="Odisha"
                   value={form.state} onChange={handleChange} />
               </div>
             </div>
@@ -115,7 +119,8 @@ export default function RegisterPage() {
               <p className="text-ocean-500 text-xs mb-3 odia">ଲଗଇନ ବିବରଣ / Login Details</p>
               <div className="mb-4">
                 <label className="label"><span className="odia">ଇମେଲ</span> / Email *</label>
-                <input name="email" type="email" className="input" placeholder="you@example.com"
+                <input name="email" type="email" className="input"
+                  placeholder="you@example.com"
                   value={form.email} onChange={handleChange} required />
               </div>
               <div>
@@ -136,7 +141,7 @@ export default function RegisterPage() {
               className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-base disabled:opacity-50 mt-2">
               {loading ? (
                 <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>ନଥିଭୁକ୍ତ ହେଉଛି...</span></>
+                <span className="odia">ନଥିଭୁକ୍ତ ହେଉଛି...</span></>
               ) : (
                 <span><span className="odia">ନଥିଭୁକ୍ତ</span> / Register</span>
               )}
@@ -146,7 +151,7 @@ export default function RegisterPage() {
           <div className="mt-6 pt-6 border-t border-ocean-800 text-center">
             <p className="text-ocean-500 text-sm">
               <span className="odia">ଖାତା ଅଛି?</span> Already have account?{' '}
-              <Link to="/login" className="text-ocean-400 hover:text-ocean-300 font-medium">
+              <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium">
                 <span className="odia">ଲଗଇନ</span> / Login
               </Link>
             </p>
