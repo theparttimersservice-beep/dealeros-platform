@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Eye, EyeOff, Fish, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Waves, AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -26,17 +26,19 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-ocean-950 flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-96 h-96 bg-ocean-700/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-tide-700/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+      <div className="absolute top-0 left-0 w-96 h-96 bg-blue-700/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-cyan-700/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
 
       <div className="w-full max-w-md animate-fadeup relative z-10">
+
+        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-ocean-500/20 border border-ocean-500/40 rounded-2xl mb-4">
-            <Fish className="w-8 h-8 text-ocean-400" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl mb-4 shadow-lg">
+            <Waves className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">AquaFlow</h1>
-          <p className="odia text-ocean-400 mt-1">ମାଛ ବ୍ୟବସାୟ ପ୍ରଣାଳୀ</p>
-          <p className="text-ocean-500 text-sm">Fish Dealer Management System</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight">NestNet</h1>
+          <p className="text-ocean-400 text-sm mt-1">Smart Business. Simple Management.</p>
+          <p className="odia text-ocean-500 text-sm">ଚିଙ୍ଗୁଡ଼ି ଓ ମାଛ ବ୍ୟବସାୟ ପ୍ରଣାଳୀ</p>
         </div>
 
         <div className="card p-8">
@@ -45,7 +47,7 @@ export default function LoginPage() {
               <span className="odia">ଲଗଇନ</span>
               <span className="text-ocean-400 text-base font-normal ml-2">/ Login</span>
             </h2>
-            <p className="text-ocean-500 text-sm mt-1">ଆପଣଙ୍କ ଖାତାରେ ପ୍ରବେଶ କରନ୍ତୁ</p>
+            <p className="text-ocean-500 text-sm mt-1 odia">ଆପଣଙ୍କ ଖାତାରେ ପ୍ରବେଶ କରନ୍ତୁ</p>
           </div>
 
           {error && (
@@ -60,7 +62,7 @@ export default function LoginPage() {
               <label className="label">
                 <span className="odia">ଇମେଲ</span> / Email
               </label>
-              <input type="email" className="input" placeholder="dealer@example.com"
+              <input type="email" className="input" placeholder="you@example.com"
                 value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
 
@@ -83,7 +85,7 @@ export default function LoginPage() {
               className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-base disabled:opacity-50">
               {loading ? (
                 <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>ଲଗଇନ ହେଉଛି...</span></>
+                <span className="odia">ଲଗଇନ ହେଉଛି...</span></>
               ) : (
                 <span><span className="odia">ଲଗଇନ</span> / Login</span>
               )}
@@ -93,12 +95,17 @@ export default function LoginPage() {
           <div className="mt-6 pt-6 border-t border-ocean-800 text-center">
             <p className="text-ocean-500 text-sm">
               <span className="odia">ନୂଆ ବ୍ୟବସାୟ?</span> New business?{' '}
-              <Link to="/register" className="text-ocean-400 hover:text-ocean-300 font-medium">
+              <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium">
                 <span className="odia">ଏଠାରେ ନଥିଭୁକ୍ତ କରନ୍ତୁ</span> / Register here
               </Link>
             </p>
           </div>
         </div>
+
+        {/* Footer */}
+        <p className="text-center text-ocean-700 text-xs mt-6">
+          NestNet © 2026 · Odisha Shrimp & Fish Business OS
+        </p>
       </div>
     </div>
   )
