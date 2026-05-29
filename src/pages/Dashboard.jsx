@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import FarmersPage from './FarmersPage'
 import DailyRatePage from './DailyRatePage'
+import DealersPage from './DealersPage'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', odia: 'ଆଜିର ସ୍ଥିତି', id: 'dashboard' },
@@ -192,6 +193,7 @@ export default function Dashboard() {
 
           {active === 'farmers' && <FarmersPage />}
           {active === 'rates' && <DailyRatePage />}
+          {active === 'dealers' && <DealersPage />}
 
           {active !== 'dashboard' && active !== 'farmers' && (
             <div className="animate-fadeup flex items-center justify-center h-64">
