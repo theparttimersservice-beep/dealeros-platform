@@ -3,26 +3,31 @@ import { useAuth } from '../context/AuthContext'
 import {
   Fish, LogOut, LayoutDashboard, Users, BookOpen,
   Package, Truck, TrendingUp, Receipt, BarChart3,
-  Menu, X, ChevronRight
+  Menu, X, ChevronRight, TrendingDown, Waves
 } from 'lucide-react'
 import FarmersPage from './FarmersPage'
+
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', odia: 'ଡ୍ୟାସ୍‌ବୋର୍ଡ', id: 'dashboard' },
-  { icon: Users, label: 'Farmers', odia: 'ମଛୁଆ', id: 'farmers' },
-  { icon: BookOpen, label: 'Farmer Ledger', odia: 'ମଛୁଆ ଖାତା', id: 'ledger' },
+  { icon: LayoutDashboard, label: 'Dashboard', odia: 'ଆଜିର ସ୍ଥିତି', id: 'dashboard' },
+  { icon: Users, label: 'Farmers', odia: 'ଚାଷୀ', id: 'farmers' },
+  { icon: Users, label: 'Dealers', odia: 'ବ୍ୟବସାୟୀ', id: 'dealers' },
+  { icon: BookOpen, label: 'Farmer Ledger', odia: 'ଚାଷୀ ଖାତା', id: 'ledger' },
+  { icon: TrendingUp, label: 'Daily Rate', odia: 'ଆଜିର ରେଟ', id: 'rates' },
+  { icon: Truck, label: 'Collection', odia: 'ସଂଗ୍ରହ', id: 'collection' },
+  { icon: Receipt, label: 'Payments', odia: 'ପେମେଣ୍ଟ', id: 'payments' },
   { icon: Package, label: 'Stock & Materials', odia: 'ସ୍ଟକ', id: 'stock' },
-  { icon: Users, label: 'Vendors', odia: 'ବିକ୍ରେତା', id: 'vendors' },
   { icon: Fish, label: 'Harvest', odia: 'ଫସଲ', id: 'harvest' },
-  { icon: Truck, label: 'Dispatch', odia: 'ଡ଼ିସ୍ପ୍ୟାଚ', id: 'dispatch' },
-  { icon: Receipt, label: 'Expenses', odia: 'ଖର୍ଚ', id: 'expenses' },
   { icon: BarChart3, label: 'Reports', odia: 'ରିପୋର୍ଟ', id: 'reports' },
+  { icon: Receipt, label: 'Expenses', odia: 'ଖର୍ଚ', id: 'expenses' },
 ]
 
 const stats = [
-  { label: 'Total Outstanding', odia: 'ମୋଟ ବକେୟା', value: '₹0', color: 'text-red-400', bg: 'bg-red-900/20', border: 'border-red-800/40' },
-  { label: "Today's Harvest", odia: 'ଆଜିର ଫସଲ', value: '0 kg', color: 'text-tide-400', bg: 'bg-tide-900/20', border: 'border-tide-800/40' },
-  { label: 'Pending Payments', odia: 'ବାକି ଦେୟ', value: '₹0', color: 'text-sand-400', bg: 'bg-sand-900/20', border: 'border-sand-800/40' },
-  { label: 'Active Farmers', odia: 'ସକ୍ରିୟ ମଛୁଆ', value: '0', color: 'text-ocean-400', bg: 'bg-ocean-900/20', border: 'border-ocean-700/40' },
+  { label: 'Active Farmers', odia: 'ସକ୍ରିୟ ଚାଷୀ', value: '0', color: 'text-blue-400', bg: 'bg-blue-900/20', border: 'border-blue-800/40', icon: Users },
+  { label: 'Active Dealers', odia: 'ସକ୍ରିୟ ବ୍ୟବସାୟୀ', value: '0', color: 'text-purple-400', bg: 'bg-purple-900/20', border: 'border-purple-800/40', icon: Users },
+  { label: "Today's Collection", odia: 'ଆଜିର ସଂଗ୍ରହ', value: '0 kg', color: 'text-green-400', bg: 'bg-green-900/20', border: 'border-green-800/40', icon: Truck },
+  { label: 'Total Due', odia: 'ମୋଟ ବାକି', value: '₹0', color: 'text-red-400', bg: 'bg-red-900/20', border: 'border-red-800/40', icon: TrendingDown },
+  { label: 'Total Received', odia: 'ମୋଟ ଆସିଲା', value: '₹0', color: 'text-emerald-400', bg: 'bg-emerald-900/20', border: 'border-emerald-800/40', icon: TrendingUp },
+  { label: "Today's Harvest", odia: 'ଆଜିର ଫସଲ', value: '0 kg', color: 'text-orange-400', bg: 'bg-orange-900/20', border: 'border-orange-800/40', icon: Fish },
 ]
 
 export default function Dashboard() {
@@ -30,28 +35,32 @@ export default function Dashboard() {
   const [active, setActive] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
+  const today = new Date().toLocaleDateString('en-IN', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  })
+
   return (
     <div className="min-h-screen bg-ocean-950 flex">
 
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'} transition-all duration-300 bg-ocean-900 border-r border-ocean-800 flex flex-col shrink-0`}>
-        
-        {/* Logo */}
+
+        {/* Logo - NestNet */}
         <div className="p-5 border-b border-ocean-800">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-ocean-500/20 border border-ocean-500/40 rounded-xl flex items-center justify-center shrink-0">
-              <Fish className="w-5 h-5 text-ocean-400" />
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shrink-0 shadow-lg">
+              <Waves className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-white font-bold text-sm leading-tight">AquaFlow</p>
-              <p className="text-ocean-500 text-xs odia">ମାଛ ବ୍ୟବସାୟ</p>
+              <p className="text-white font-bold text-base leading-tight tracking-wide">NestNet</p>
+              <p className="text-ocean-400 text-xs">Smart Business. Simple Management.</p>
             </div>
           </div>
         </div>
 
         {/* Business info */}
         <div className="px-4 py-3 border-b border-ocean-800 bg-ocean-950/30">
-          <p className="text-ocean-300 text-xs font-semibold truncate">{profile?.dealers?.name || '...'}</p>
+          <p className="text-ocean-300 text-xs font-semibold truncate">{profile?.dealers?.name || 'ଆପଣଙ୍କ ବ୍ୟବସାୟ'}</p>
           <p className="text-ocean-500 text-xs truncate">{profile?.full_name} · <span className="capitalize">{profile?.role}</span></p>
         </div>
 
@@ -63,7 +72,7 @@ export default function Dashboard() {
               onClick={() => setActive(item.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group
                 ${active === item.id
-                  ? 'bg-ocean-500/20 border border-ocean-500/40 text-ocean-300'
+                  ? 'bg-blue-500/20 border border-blue-500/40 text-blue-300'
                   : 'text-ocean-500 hover:bg-ocean-800 hover:text-ocean-300 border border-transparent'
                 }`}
             >
@@ -108,8 +117,8 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <div className="w-2 h-2 bg-tide-400 rounded-full animate-pulse" />
-            <span className="text-tide-400 text-xs odia">ସିଷ୍ଟମ ଚାଲୁ</span>
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-green-400 text-xs odia">ସିଷ୍ଟମ ଚାଲୁ</span>
           </div>
         </header>
 
@@ -120,17 +129,27 @@ export default function Dashboard() {
             <div className="animate-fadeup space-y-6">
 
               {/* Welcome */}
-              <div>
-                <h1 className="text-white text-xl font-bold">
-                  <span className="odia">ନମସ୍କାର</span>, {profile?.full_name?.split(' ')[0] || 'Owner'} 👋
-                </h1>
-                <p className="text-ocean-500 text-sm mt-1">{profile?.dealers?.name}</p>
+              <div className="flex items-start justify-between">
+                <div>
+                  <h1 className="text-white text-2xl font-bold">
+                    <span className="odia">ନମସ୍କାର</span>, {profile?.full_name?.split(' ')[0] || 'Owner'} 👋
+                  </h1>
+                  <p className="text-ocean-400 text-sm mt-1 odia">ଆଜିର ବ୍ୟବସାୟ ସ୍ଥିତି ଦେଖନ୍ତୁ</p>
+                  <p className="text-ocean-600 text-xs mt-0.5">{today}</p>
+                </div>
+                <div className="text-right hidden md:block">
+                  <p className="text-ocean-400 text-xs odia">ଆପଣଙ୍କ ବ୍ୟବସାୟ</p>
+                  <p className="text-white text-sm font-semibold">{profile?.dealers?.name || 'NestNet'}</p>
+                </div>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {stats.map((stat, i) => (
-                  <div key={i} className={`card p-4 border ${stat.border} ${stat.bg}`}>
+                  <div key={i} className={`card p-4 border ${stat.border} ${stat.bg} rounded-2xl`}>
+                    <div className="flex items-start justify-between mb-2">
+                      <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                    </div>
                     <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
                     <p className={`text-xs font-medium odia mt-1 ${stat.color}`}>{stat.odia}</p>
                     <p className="text-ocean-600 text-xs">{stat.label}</p>
@@ -138,19 +157,19 @@ export default function Dashboard() {
                 ))}
               </div>
 
-              {/* Quick actions */}
+              {/* Quick Actions */}
               <div>
-                <h2 className="text-ocean-300 text-sm font-semibold mb-3 odia">ଶୀଘ୍ର କାର୍ଯ୍ୟ / Quick Actions</h2>
+                <h2 className="text-ocean-300 text-sm font-semibold mb-3 odia">⚡ ଶୀଘ୍ର କାର୍ଯ୍ୟ / Quick Actions</h2>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   {[
-                    { label: 'Add Farmer', odia: 'ମଛୁଆ ଯୋଗ', icon: Users, id: 'farmers' },
-                    { label: 'New Ledger Entry', odia: 'ଖାତା ଏଣ୍ଟ୍ରି', icon: BookOpen, id: 'ledger' },
-                    { label: 'Record Harvest', odia: 'ଫସଲ ରେକର୍ଡ', icon: Fish, id: 'harvest' },
-                    { label: 'Add Expense', odia: 'ଖର୍ଚ ଯୋଗ', icon: Receipt, id: 'expenses' },
+                    { label: 'Add Farmer', odia: 'ଚାଷୀ ଯୋଗ କରନ୍ତୁ', icon: Users, id: 'farmers', color: 'text-blue-400' },
+                    { label: 'Daily Rate', odia: 'ଆଜିର ରେଟ ଦିଅନ୍ତୁ', icon: TrendingUp, id: 'rates', color: 'text-green-400' },
+                    { label: 'New Collection', odia: 'ନୂଆ ସଂଗ୍ରହ', icon: Truck, id: 'collection', color: 'text-orange-400' },
+                    { label: 'Add Payment', odia: 'ପେମେଣ୍ଟ ଯୋଗ', icon: Receipt, id: 'payments', color: 'text-purple-400' },
                   ].map((action, i) => (
                     <button key={i} onClick={() => setActive(action.id)}
-                      className="card p-4 hover:bg-ocean-800 transition-all text-left border-ocean-700 group">
-                      <action.icon className="w-6 h-6 text-ocean-400 mb-2 group-hover:text-ocean-300" />
+                      className="card p-4 hover:bg-ocean-800 transition-all text-left border-ocean-700 group rounded-2xl">
+                      <action.icon className={`w-6 h-6 ${action.color} mb-2`} />
                       <p className="text-ocean-300 text-xs font-medium odia">{action.odia}</p>
                       <p className="text-ocean-600 text-xs">{action.label}</p>
                     </button>
@@ -158,10 +177,13 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Coming soon modules */}
-              <div className="card p-5 border-ocean-700">
-                <p className="text-ocean-400 text-sm odia mb-1">ଆସୁଥିବା ମଡ୍ୟୁଲ</p>
-                <p className="text-ocean-600 text-xs">Farmer Ledger, Stock Management, Harvest Recording, Dispatch & Reports — coming next!</p>
+              {/* NestNet Info */}
+              <div className="card p-5 border-blue-800/30 bg-blue-900/10 rounded-2xl">
+                <div className="flex items-center gap-3 mb-2">
+                  <Waves className="w-5 h-5 text-blue-400" />
+                  <p className="text-blue-300 text-sm font-semibold">NestNet — Smart Business. Simple Management.</p>
+                </div>
+                <p className="text-ocean-500 text-xs odia">ଆଜିର ରେଟ, ସଂଗ୍ରହ, ପେମେଣ୍ଟ ଏବଂ ରିପୋର୍ଟ ସବୁ ଏଠାରେ ମିଳିବ।</p>
               </div>
 
             </div>
@@ -169,17 +191,18 @@ export default function Dashboard() {
 
           {active === 'farmers' && <FarmersPage />}
 
-{active !== 'dashboard' && active !== 'farmers' && (
-  <div className="animate-fadeup flex items-center justify-center h-64">
-    <div className="text-center">
-      <div className="w-16 h-16 bg-ocean-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        {(() => { const item = menuItems.find(m => m.id === active); return item ? <item.icon className="w-8 h-8 text-ocean-500" /> : null })()}
-      </div>
-      <p className="text-ocean-300 font-medium odia">{menuItems.find(m => m.id === active)?.odia}</p>
-      <p className="text-ocean-600 text-sm mt-1">{menuItems.find(m => m.id === active)?.label} — Coming soon</p>
-    </div>
-  </div>
-)}
+          {active !== 'dashboard' && active !== 'farmers' && (
+            <div className="animate-fadeup flex items-center justify-center h-64">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-ocean-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  {(() => { const item = menuItems.find(m => m.id === active); return item ? <item.icon className="w-8 h-8 text-ocean-500" /> : null })()}
+                </div>
+                <p className="text-ocean-300 font-medium odia">{menuItems.find(m => m.id === active)?.odia}</p>
+                <p className="text-ocean-600 text-sm mt-1">{menuItems.find(m => m.id === active)?.label} — Coming soon</p>
+                <p className="text-ocean-700 text-xs mt-1 odia">ଶୀଘ୍ର ଆସୁଛି...</p>
+              </div>
+            </div>
+          )}
 
         </main>
       </div>
