@@ -7,12 +7,12 @@ import {
 } from 'lucide-react'
 import FarmersPage from './FarmersPage'
 import DailyRatePage from './DailyRatePage'
-import DealersPage from './DealersPage'
+import BuyersPage from './BuyersPage'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', odia: 'ଆଜିର ସ୍ଥିତି', id: 'dashboard' },
   { icon: Users, label: 'Farmers', odia: 'ଚାଷୀ', id: 'farmers' },
-  { icon: Users, label: 'Dealers', odia: 'ବ୍ୟବସାୟୀ', id: 'dealers' },
+  { icon: Users, label: 'Buyers/Clients', odia: 'ଖରିଦାର', id: 'buyers' },
   { icon: BookOpen, label: 'Farmer Ledger', odia: 'ଚାଷୀ ଖାତା', id: 'ledger' },
   { icon: TrendingUp, label: 'Daily Rate', odia: 'ଆଜିର ରେଟ', id: 'rates' },
   { icon: Truck, label: 'Collection', odia: 'ସଂଗ୍ରହ', id: 'collection' },
@@ -193,7 +193,7 @@ export default function Dashboard() {
 
           {active === 'farmers' && <FarmersPage />}
           {active === 'rates' && <DailyRatePage />}
-          {active === 'dealers' && <DealersPage />}
+          {active === 'buyers' && <BuyersPage />}
 
           {active !== 'dashboard' && active !== 'farmers' && (
             <div className="animate-fadeup flex items-center justify-center h-64">
