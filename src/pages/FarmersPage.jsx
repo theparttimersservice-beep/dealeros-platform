@@ -77,7 +77,7 @@ export default function FarmersPage() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 overflow-y-auto">
-          <div className="min-h-full flex items-center justify-center p-4">
+          <div className="min-h-full flex items-start justify-center p-4 pt-10">
             <div className="card w-full max-w-md p-6 animate-fadeup my-8">
               <div className="flex items-center justify-between mb-5">
                 <div>
