@@ -89,7 +89,7 @@ export default function FarmersPage() {
       {/* Modal */}
       {showForm && (
         <div
-          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/70 z-[9999] flex items-center justify-center p-4"
           onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}
         >
           <div className="bg-ocean-900 border border-ocean-700 rounded-2xl w-full max-w-md p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
