@@ -26,7 +26,7 @@ const ENTRY_TYPES = [
   { id: 'adjustment', label: 'Adjustment', odia: 'ସଂଶୋଧନ', isCredit: true, color: 'text-sand-400', bg: 'bg-sand-900/20', border: 'border-sand-800/40' },
 ]
 
-export default function CompanyLedgerPage() {
+export default function CompanyLedgerPage({ preSelectedCompanyId = null }) {
   const { profile } = useAuth()
   const [companies, setCompanies] = useState([])
   const [selectedCompany, setSelectedCompany] = useState(null)
@@ -45,10 +45,16 @@ export default function CompanyLedgerPage() {
 
   useEffect(() => { if (profile) fetchCompanies() }, [profile])
   useEffect(() => { if (selectedCompany) fetchEntries(selectedCompany.id) }, [season])
+  useEffect(() => {
+    if (preSelectedCompanyId && companies.length > 0) {
+      const company = companies.find(c => c.id === preSelectedCompanyId)
+      if (company) selectCompany(company)
+    }
+  }, [preSelectedCompanyId, companies])
 
   async function fetchCompanies() {
     const { data } = await supabase
-      .from('companies')
+      .from('buyers')
       .select('*')
       .eq('dealer_id', profile.dealer_id)
       .eq('active', true)
@@ -84,7 +90,6 @@ export default function CompanyLedgerPage() {
 
   const balance = totalDispatched - totalReceived
 
-  // Auto calculate amount if kg and rate given
   useEffect(() => {
     if (form.quantity_kg && form.rate_per_kg) {
       const amt = parseFloat(form.quantity_kg) * parseFloat(form.rate_per_kg)
@@ -150,18 +155,16 @@ export default function CompanyLedgerPage() {
   return (
     <div className="animate-fadeup">
       <div className="flex gap-4">
-
-        {/* Left — Company List */}
         <div className="w-60 shrink-0 space-y-2">
           <div className="mb-3">
-            <h2 className="text-white font-bold odia">କମ୍ପାନୀ ଖାତା</h2>
-            <p className="text-ocean-500 text-xs">Company Ledger</p>
+            <h2 className="text-white font-bold odia">ଖରିଦାର ଖାତା</h2>
+            <p className="text-ocean-500 text-xs">Buyer Ledger</p>
           </div>
           <input className="input text-sm" placeholder="ଖୋଜ / Search..."
             value={search} onChange={e => setSearch(e.target.value)} />
           {filteredCompanies.length === 0 ? (
             <div className="text-center py-6">
-              <p className="text-ocean-600 text-sm">No companies yet</p>
+              <p className="text-ocean-600 text-sm">No buyers yet</p>
               <p className="text-ocean-700 text-xs mt-1">Add from Buyers/Clients page</p>
             </div>
           ) : (
@@ -172,32 +175,29 @@ export default function CompanyLedgerPage() {
                     ? 'bg-ocean-700 border-ocean-500 text-white'
                     : 'bg-ocean-900 border-ocean-800 text-ocean-300 hover:border-ocean-600'}`}>
                 <p className="font-medium text-sm">{company.name}</p>
-                {company.location && <p className="text-xs opacity-50">{company.location}</p>}
-                {company.contact && <p className="text-xs opacity-50">{company.contact}</p>}
+                {company.village && <p className="text-xs opacity-50">{company.village}{company.district ? ', ' + company.district : ''}</p>}
+                {company.phone && <p className="text-xs opacity-50">{company.phone}</p>}
               </button>
             ))
           )}
         </div>
 
-        {/* Right — Ledger */}
         <div className="flex-1 min-w-0">
           {!selectedCompany ? (
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
                 <BookOpen className="w-12 h-12 text-ocean-700 mx-auto mb-3" />
-                <p className="text-ocean-400 odia">କମ୍ପାନୀ ବାଛନ୍ତୁ</p>
-                <p className="text-ocean-600 text-sm">Select a company from left</p>
+                <p className="text-ocean-400 odia">ଖରିଦାର ବାଛନ୍ତୁ</p>
+                <p className="text-ocean-600 text-sm">Select a buyer from left</p>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-
-              {/* Header */}
               <div className="flex items-start justify-between flex-wrap gap-3">
                 <div>
                   <h2 className="text-white font-bold text-lg">{selectedCompany.name}</h2>
-                  {selectedCompany.location && <p className="text-ocean-400 text-sm">{selectedCompany.location}</p>}
-                  {selectedCompany.contact && <p className="text-ocean-500 text-xs">{selectedCompany.contact}</p>}
+                  {selectedCompany.village && <p className="text-ocean-400 text-sm">{selectedCompany.village}{selectedCompany.district ? ', ' + selectedCompany.district : ''}</p>}
+                  {selectedCompany.phone && <p className="text-ocean-500 text-xs">{selectedCompany.phone}</p>}
                 </div>
                 <div className="flex items-center gap-2">
                   <label className="text-ocean-400 text-xs odia">ସିଜନ:</label>
@@ -210,7 +210,6 @@ export default function CompanyLedgerPage() {
                 </div>
               </div>
 
-              {/* Summary Cards */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="card p-3 border-red-800/40 bg-red-900/10">
                   <p className="text-red-400 font-bold text-xl">₹{totalDispatched.toLocaleString('en-IN')}</p>
@@ -230,12 +229,11 @@ export default function CompanyLedgerPage() {
                     {balance > 0 ? 'ବାକି ଦେବାକୁ ଅଛି' : 'ସଫା'}
                   </p>
                   <p className="text-ocean-600 text-xs">
-                    {balance > 0 ? 'Company Owes Dealer' : 'Clear'}
+                    {balance > 0 ? 'Buyer Owes Dealer' : 'Clear'}
                   </p>
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex gap-2">
                 <button onClick={() => setShowForm(true)} className="btn-primary flex items-center gap-2 text-sm py-2">
                   <Plus className="w-4 h-4" />
@@ -247,7 +245,6 @@ export default function CompanyLedgerPage() {
                 </button>
               </div>
 
-              {/* Add Entry Form */}
               {showForm && (
                 <div className="card p-5 border-ocean-700 space-y-3">
                   <div className="flex items-center justify-between">
@@ -331,7 +328,6 @@ export default function CompanyLedgerPage() {
                 </div>
               )}
 
-              {/* Entries */}
               {loading ? (
                 <div className="flex justify-center py-8">
                   <div className="w-8 h-8 border-4 border-ocean-500 border-t-transparent rounded-full animate-spin" />
