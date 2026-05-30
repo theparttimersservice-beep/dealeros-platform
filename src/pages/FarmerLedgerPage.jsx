@@ -30,7 +30,7 @@ const ENTRY_TYPES = [
   { id: 'adjustment', label: 'Adjustment', odia: 'ସଂଶୋଧନ', color: 'text-sand-400', bg: 'bg-sand-900/20', border: 'border-sand-800/40', isCredit: true },
 ]
 
-export default function FarmerLedgerPage() {
+export default function FarmerLedgerPage({ preSelectedFarmerId = null }) {
   const { profile } = useAuth()
   const [farmers, setFarmers] = useState([])
   const [selectedFarmer, setSelectedFarmer] = useState(null)
@@ -47,6 +47,12 @@ export default function FarmerLedgerPage() {
   })
 
   useEffect(() => { if (profile) fetchFarmers() }, [profile])
+  useEffect(() => {
+  if (preSelectedFarmerId && farmers.length > 0) {
+    const farmer = farmers.find(f => f.id === preSelectedFarmerId)
+    if (farmer) selectFarmer(farmer)
+  }
+}, [preSelectedFarmerId, farmers])
   useEffect(() => { if (selectedFarmer) fetchEntries(selectedFarmer.id) }, [season])
 
   async function fetchFarmers() {
