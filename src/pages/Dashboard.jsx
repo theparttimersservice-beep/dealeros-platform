@@ -10,6 +10,7 @@ import DailyRatePage from './DailyRatePage'
 import BuyersPage from './BuyersPage'
 import CollectionPage from './CollectionPage'
 import FarmerLedgerPage from './FarmerLedgerPage'
+import CompanyLedgerPage from './CompanyLedgerPage'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', odia: 'ଆଜିର ସ୍ଥିତି', id: 'dashboard' },
@@ -196,6 +197,7 @@ export default function Dashboard() {
           {active === 'farmers' && <FarmersPage />}
           {active === 'rates' && <DailyRatePage />}
           {active === 'buyers' && <BuyersPage />}
+          {active === 'company-ledger' && <CompanyLedgerPage />}
           {active === 'collection' && <CollectionPage />}
           {active === 'ledger' && <FarmerLedgerPage />}
 
