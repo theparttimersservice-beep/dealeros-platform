@@ -12,6 +12,7 @@ import BuyersPage from './BuyersPage'
 import CollectionPage from './CollectionPage'
 import FarmerLedgerPage from './FarmerLedgerPage'
 import CompanyLedgerPage from './CompanyLedgerPage'
+import PaymentsPage from './PaymentsPage'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', odia: 'ଆଜିର ସ୍ଥିତି', id: 'dashboard' },
@@ -237,9 +238,10 @@ export default function Dashboard() {
           {active === 'buyers' && <BuyersPage onViewLedger={(id) => { setSelectedCompanyId(id); setActive('company-ledger') }} />}
           {active === 'company-ledger' && <CompanyLedgerPage preSelectedCompanyId={selectedCompanyId} />}
           {active === 'collection' && <CollectionPage />}
+          {active === 'payments' && <PaymentsPage />}
           {active === 'ledger' && <FarmerLedgerPage preSelectedFarmerId={selectedFarmerId} />}
 
-          {active !== 'dashboard' && active !== 'farmers' && active !== 'ledger' && active !== 'buyers' && active !== 'rates' && active !== 'collection' && active !== 'company-ledger' && (
+          {active !== 'dashboard' && active !== 'farmers' && active !== 'ledger' && active !== 'buyers' && active !== 'rates' && active !== 'collection' && active !== 'payments' && active !== 'company-ledger' && active !== 'company-ledger' && (
             <div className="animate-fadeup flex items-center justify-center h-64">
               <div className="text-center">
                 <div className="w-16 h-16 bg-ocean-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
