@@ -38,6 +38,8 @@ const stats = [
 export default function Dashboard() {
   const { profile, logout } = useAuth()
   const [active, setActive] = useState('dashboard')
+  const [selectedFarmerId, setSelectedFarmerId] = useState(null)
+  const [selectedCompanyId, setSelectedCompanyId] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const today = new Date().toLocaleDateString('en-IN', {
@@ -194,12 +196,12 @@ export default function Dashboard() {
             </div>
           )}
 
-          {active === 'farmers' && <FarmersPage />}
+          {active === 'farmers' && <FarmersPage onViewLedger={(id) => { setSelectedFarmerId(id); setActive('ledger') }} />}
           {active === 'rates' && <DailyRatePage />}
-          {active === 'buyers' && <BuyersPage />}
-          {active === 'company-ledger' && <CompanyLedgerPage />}
+          {active === 'buyers' && <BuyersPage onViewLedger={(id) => { setSelectedCompanyId(id); setActive('company-ledger') }} />}
+          {active === 'company-ledger' && <CompanyLedgerPage preSelectedCompanyId={selectedCompanyId} />}
           {active === 'collection' && <CollectionPage />}
-          {active === 'ledger' && <FarmerLedgerPage />}
+          {active === 'ledger' && <FarmerLedgerPage preSelectedFarmerId={selectedFarmerId} />}
 
           {active !== 'dashboard' && active !== 'farmers' && active !== 'ledger' && active !== 'buyers' && active !== 'rates' && active !== 'collection' && active !== 'payments' && active !== 'stock' && active !== 'harvest' && active !== 'reports' && active !== 'expenses' && (
             <div className="animate-fadeup flex items-center justify-center h-64">
