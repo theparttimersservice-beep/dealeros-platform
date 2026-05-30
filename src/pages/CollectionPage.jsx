@@ -101,7 +101,12 @@ export default function CollectionPage() {
       // Auto Farmer Ledger entry
       if (form.farmer_id) {
         const fish = FISH_TYPES.find(f => f.id === form.fish_type)
-        await supabase.from('farmer_ledger').insert({
+        const currentYear = new Date().getFullYear()
+        const season = new Date().getMonth() >= 3 
+          ? `${currentYear}-${(currentYear + 1).toString().slice(2)}`
+          : `${currentYear - 1}-${currentYear.toString().slice(2)}`
+        
+        const { error: ledgerError } = await supabase.from('farmer_ledger').insert({
           farmer_id: form.farmer_id,
           dealer_id: profile?.dealer_id,
           entry_type: 'harvest_recovery',
@@ -109,7 +114,9 @@ export default function CollectionPage() {
           description: `ଫସଲ ଆସିଲା — ${fish?.odia || form.fish_type} ${form.quantity_kg}kg @ ₹${form.rate_per_kg}`,
           entry_date: today,
           reference_type: 'collection',
+          season: season,
         })
+        if (ledgerError) console.log('Ledger error:', ledgerError.message)
       }
       setMsg('✅ ସଂଗ୍ରହ ଯୋଗ ହୋଇଗଲା! Farmer ledger auto updated.')
       setForm({ farmer_id: '', village: '', fish_type: '', quantity_kg: '', rate_per_kg: '', notes: '' })
