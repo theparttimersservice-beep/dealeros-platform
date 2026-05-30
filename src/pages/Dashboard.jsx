@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { supabase } from '../lib/supabase'
 import {
   Fish, LogOut, LayoutDashboard, Users, BookOpen,
   Package, Truck, TrendingUp, Receipt, BarChart3,
@@ -26,25 +27,60 @@ const menuItems = [
   { icon: Receipt, label: 'Expenses', odia: 'ଖର୍ଚ', id: 'expenses' },
 ]
 
-const stats = [
-  { label: 'Active Farmers', odia: 'ସକ୍ରିୟ ଚାଷୀ', value: '0', color: 'text-blue-400', bg: 'bg-blue-900/20', border: 'border-blue-800/40', icon: Users },
-  { label: 'Active Dealers', odia: 'ସକ୍ରିୟ ବ୍ୟବସାୟୀ', value: '0', color: 'text-purple-400', bg: 'bg-purple-900/20', border: 'border-purple-800/40', icon: Users },
-  { label: "Today's Collection", odia: 'ଆଜିର ସଂଗ୍ରହ', value: '0 kg', color: 'text-green-400', bg: 'bg-green-900/20', border: 'border-green-800/40', icon: Truck },
-  { label: 'Total Due', odia: 'ମୋଟ ବାକି', value: '₹0', color: 'text-red-400', bg: 'bg-red-900/20', border: 'border-red-800/40', icon: TrendingDown },
-  { label: 'Total Received', odia: 'ମୋଟ ଆସିଲା', value: '₹0', color: 'text-emerald-400', bg: 'bg-emerald-900/20', border: 'border-emerald-800/40', icon: TrendingUp },
-  { label: "Today's Harvest", odia: 'ଆଜିର ଫସଲ', value: '0 kg', color: 'text-orange-400', bg: 'bg-orange-900/20', border: 'border-orange-800/40', icon: Fish },
-]
-
 export default function Dashboard() {
   const { profile, logout } = useAuth()
   const [active, setActive] = useState('dashboard')
   const [selectedFarmerId, setSelectedFarmerId] = useState(null)
   const [selectedCompanyId, setSelectedCompanyId] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [dashStats, setDashStats] = useState({
+    farmers: 0, buyers: 0, collection: 0,
+    totalDue: 0, totalReceived: 0, harvest: 0
+  })
 
   const today = new Date().toLocaleDateString('en-IN', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   })
+  const todayISO = new Date().toISOString().split('T')[0]
+
+  useEffect(() => {
+    if (profile) fetchStats()
+  }, [profile])
+
+  async function fetchStats() {
+    try {
+      const [farmers, buyers, collections, payments, harvests] = await Promise.all([
+        supabase.from('farmers').select('id', { count: 'exact' }).eq('dealer_id', profile?.dealer_id).eq('active', true),
+        supabase.from('buyers').select('id', { count: 'exact' }).eq('active', true),
+        supabase.from('collections').select('quantity_kg').eq('collection_date', todayISO),
+        supabase.from('payments').select('amount, payment_type'),
+        supabase.from('harvests').select('quantity').eq('harvest_date', todayISO),
+      ])
+      const todayKg = collections.data?.reduce((s, c) => s + (c.quantity_kg || 0), 0) || 0
+      const received = payments.data?.filter(p => p.payment_type === 'received').reduce((s, p) => s + (p.amount || 0), 0) || 0
+      const due = payments.data?.filter(p => p.payment_type === 'due').reduce((s, p) => s + (p.amount || 0), 0) || 0
+      const todayHarvest = harvests.data?.reduce((s, h) => s + (h.quantity || 0), 0) || 0
+      setDashStats({
+        farmers: farmers.count || 0,
+        buyers: buyers.count || 0,
+        collection: todayKg,
+        totalDue: due,
+        totalReceived: received,
+        harvest: todayHarvest
+      })
+    } catch (e) {
+      console.log('Stats fetch error', e)
+    }
+  }
+
+  const statsCards = [
+    { label: 'Active Farmers', odia: 'ସକ୍ରିୟ ଚାଷୀ', value: dashStats.farmers, color: 'text-blue-400', bg: 'bg-blue-900/20', border: 'border-blue-800/40', icon: Users },
+    { label: 'Active Buyers', odia: 'ସକ୍ରିୟ ଖରିଦାର', value: dashStats.buyers, color: 'text-purple-400', bg: 'bg-purple-900/20', border: 'border-purple-800/40', icon: Users },
+    { label: "Today's Collection", odia: 'ଆଜିର ସଂଗ୍ରହ', value: dashStats.collection.toFixed(1) + ' kg', color: 'text-green-400', bg: 'bg-green-900/20', border: 'border-green-800/40', icon: Truck },
+    { label: 'Total Due', odia: 'ମୋଟ ବାକି', value: '₹' + dashStats.totalDue.toLocaleString('en-IN'), color: 'text-red-400', bg: 'bg-red-900/20', border: 'border-red-800/40', icon: TrendingDown },
+    { label: 'Total Received', odia: 'ମୋଟ ଆସିଲା', value: '₹' + dashStats.totalReceived.toLocaleString('en-IN'), color: 'text-emerald-400', bg: 'bg-emerald-900/20', border: 'border-emerald-800/40', icon: TrendingUp },
+    { label: "Today's Harvest", odia: 'ଆଜିର ଫସଲ', value: dashStats.harvest + ' kg', color: 'text-orange-400', bg: 'bg-orange-900/20', border: 'border-orange-800/40', icon: Fish },
+  ]
 
   return (
     <div className="min-h-screen bg-ocean-950 flex">
@@ -52,7 +88,7 @@ export default function Dashboard() {
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'} transition-all duration-300 bg-ocean-900 border-r border-ocean-800 flex flex-col shrink-0`}>
 
-        {/* Logo - NestNet */}
+        {/* Logo */}
         <div className="p-5 border-b border-ocean-800">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shrink-0 shadow-lg">
@@ -146,13 +182,13 @@ export default function Dashboard() {
                 </div>
                 <div className="text-right hidden md:block">
                   <p className="text-ocean-400 text-xs odia">ଆପଣଙ୍କ ବ୍ୟବସାୟ</p>
-                  <p className="text-white text-sm font-semibold">{profile?.dealers?.name || 'NestNet'}</p>
+                  <p className="text-white text-sm font-semibold">{profile?.business_name || 'NestNet'}</p>
                 </div>
               </div>
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                {stats.map((stat, i) => (
+                {statsCards.map((stat, i) => (
                   <div key={i} className={`card p-4 border ${stat.border} ${stat.bg} rounded-2xl`}>
                     <div className="flex items-start justify-between mb-2">
                       <stat.icon className={`w-5 h-5 ${stat.color}`} />
@@ -203,7 +239,7 @@ export default function Dashboard() {
           {active === 'collection' && <CollectionPage />}
           {active === 'ledger' && <FarmerLedgerPage preSelectedFarmerId={selectedFarmerId} />}
 
-          {active !== 'dashboard' && active !== 'farmers' && active !== 'ledger' && active !== 'buyers' && active !== 'rates' && active !== 'collection' && active !== 'payments' && active !== 'stock' && active !== 'harvest' && active !== 'reports' && active !== 'expenses' && (
+          {active !== 'dashboard' && active !== 'farmers' && active !== 'ledger' && active !== 'buyers' && active !== 'rates' && active !== 'collection' && active !== 'company-ledger' && (
             <div className="animate-fadeup flex items-center justify-center h-64">
               <div className="text-center">
                 <div className="w-16 h-16 bg-ocean-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
