@@ -199,7 +199,7 @@ export default function Dashboard() {
           {active === 'collection' && <CollectionPage />}
           {active === 'ledger' && <FarmerLedgerPage />}
 
-          {active !== 'dashboard' && active !== 'farmers' && active !== 'ledger' && (
+          {active !== 'dashboard' && active !== 'farmers' && active !== 'ledger' && active !== 'buyers' && active !== 'rates' && active !== 'collection' && active !== 'payments' && active !== 'stock' && active !== 'harvest' && active !== 'reports' && active !== 'expenses' && (
             <div className="animate-fadeup flex items-center justify-center h-64">
               <div className="text-center">
                 <div className="w-16 h-16 bg-ocean-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
