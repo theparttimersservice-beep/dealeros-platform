@@ -84,7 +84,7 @@ export default function CollectionPage() {
       return
     }
     setSaving(true)
-    const { error } = await supabase.from('collections').insert({
+    const { data: colData, error } = await supabase.from('collections').insert({
       farmer_id: form.farmer_id || null,
       village: form.village,
       fish_type: form.fish_type,
@@ -93,11 +93,25 @@ export default function CollectionPage() {
       total_amount: totalAmount,
       collection_date: today,
       notes: form.notes,
-    })
+    }).select().single()
+
     if (error) {
       setMsg('❌ Error: ' + error.message)
     } else {
-      setMsg('✅ ସଂଗ୍ରହ ଯୋଗ ହୋଇଗଲା!')
+      // Auto Farmer Ledger entry
+      if (form.farmer_id) {
+        const fish = FISH_TYPES.find(f => f.id === form.fish_type)
+        await supabase.from('farmer_ledger').insert({
+          farmer_id: form.farmer_id,
+          dealer_id: profile?.dealer_id,
+          entry_type: 'credit',
+          amount: totalAmount,
+          description: `ଫସଲ ଆସିଲା — ${fish?.odia || form.fish_type} ${form.quantity_kg}kg @ ₹${form.rate_per_kg}`,
+          entry_date: today,
+          reference_type: 'collection',
+        })
+      }
+      setMsg('✅ ସଂଗ୍ରହ ଯୋଗ ହୋଇଗଲା! Farmer ledger auto updated.')
       setForm({ farmer_id: '', village: '', fish_type: '', quantity_kg: '', rate_per_kg: '', notes: '' })
       setShowForm(false)
       fetchAll()
