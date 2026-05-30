@@ -20,7 +20,7 @@ export default function BuyersPage({ onViewLedger = () => {} }) {
   async function fetchBuyers() {
     setLoading(true)
     const { data } = await supabase
-      .from('companies')
+      .from('buyers')
       .select('*')
       .eq('dealer_id', profile.dealer_id)
       .eq('active', true)
@@ -35,10 +35,14 @@ export default function BuyersPage({ onViewLedger = () => {} }) {
       return
     }
     setSaving(true)
-    const { error } = await supabase.from('companies').insert({
+    const { error } = await supabase.from('buyers').insert({
       name: form.name,
-      contact: form.phone,
-      location: form.village + (form.district ? ', ' + form.district : ''),
+      owner_name: form.owner_name,
+      phone: form.phone,
+      village: form.village,
+      district: form.district,
+      business_type: form.business_type,
+      notes: form.notes,
       dealer_id: profile.dealer_id,
       active: true,
     })
@@ -164,17 +168,24 @@ export default function BuyersPage({ onViewLedger = () => {} }) {
               </div>
               <p className="text-white font-semibold">{buyer.name}</p>
               {buyer.owner_name && <p className="text-ocean-400 text-sm mt-0.5">{buyer.owner_name}</p>}
-              {buyer.contact && (
+              {buyer.phone && (
                 <div className="flex items-center gap-1.5 mt-2">
                   <Phone className="w-3 h-3 text-ocean-500" />
-                  <p className="text-ocean-400 text-sm">{buyer.contact}</p>
+                  <p className="text-ocean-400 text-sm">{buyer.phone}</p>
                 </div>
               )}
-              {buyer.location && (
+              {buyer.village && (
                 <div className="flex items-center gap-1.5 mt-1">
                   <MapPin className="w-3 h-3 text-ocean-500" />
-                  <p className="text-ocean-500 text-xs">{buyer.location}</p>
+                  <p className="text-ocean-500 text-xs">
+                    {buyer.village}{buyer.district ? ', ' + buyer.district : ''}
+                  </p>
                 </div>
+              )}
+              {buyer.notes && (
+                <p className="text-ocean-600 text-xs mt-2 border-t border-ocean-800 pt-2">
+                  {buyer.notes}
+                </p>
               )}
             </div>
           ))}
