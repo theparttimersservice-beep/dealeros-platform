@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { Plus, X, Save, BookOpen, AlertCircle, Download, Trash2, Pencil } from 'lucide-react'
+import { Plus, X, Save, BookOpen, AlertCircle, Download, Trash2, Pencil, Printer } from 'lucide-react'
 
 function getCurrentSeason() {
   const now = new Date()
@@ -102,6 +102,115 @@ export default function FarmerLedgerPage({ preSelectedFarmerId = null }) {
     if (!window.confirm('Delete this entry?')) return
     await supabase.from('farmer_ledger').delete().eq('id', entryId)
     fetchEntries(selectedFarmer.id)
+  }
+
+  function printReceipt(entry) {
+    const type = ENTRY_TYPES.find(t => t.id === entry.entry_type)
+    const amt = parseFloat(entry.amount)
+    const receiptHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Receipt</title>
+        <style>
+          body { font-family: Arial, sans-serif; max-width: 400px; margin: 20px auto; padding: 20px; }
+          .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+          .logo { font-size: 24px; font-weight: bold; color: #1a56db; }
+          .tagline { font-size: 12px; color: #666; }
+          .receipt-no { font-size: 11px; color: #999; margin-top: 5px; }
+          .section { margin: 10px 0; }
+          .row { display: flex; justify-content: space-between; margin: 5px 0; font-size: 13px; }
+          .label { color: #666; }
+          .value { font-weight: bold; }
+          .amount-box { background: #f0f9ff; border: 2px solid #1a56db; border-radius: 8px; padding: 15px; text-align: center; margin: 15px 0; }
+          .amount { font-size: 28px; font-weight: bold; color: #1a56db; }
+          .amount-label { font-size: 12px; color: #666; }
+          .footer { border-top: 1px solid #ccc; margin-top: 20px; padding-top: 10px; }
+          .sign-area { display: flex; justify-content: space-between; margin-top: 30px; }
+          .sign-line { border-top: 1px solid #000; width: 120px; text-align: center; font-size: 11px; padding-top: 5px; }
+          .type-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; 
+            background: ${type?.isCredit ? '#fef2f2' : '#f0fdf4'}; 
+            color: ${type?.isCredit ? '#dc2626' : '#16a34a'}; 
+            border: 1px solid ${type?.isCredit ? '#fca5a5' : '#86efac'}; }
+          @media print { body { margin: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="logo">🌊 NestNet</div>
+          <div class="tagline">Smart Business. Simple Management.</div>
+          <div class="receipt-no">Receipt #${entry.id.slice(0,8).toUpperCase()}</div>
+        </div>
+        
+        <div class="section">
+          <div class="row">
+            <span class="label">Business:</span>
+            <span class="value">${profile?.business_name || 'NestNet'}</span>
+          </div>
+          <div class="row">
+            <span class="label">Owner:</span>
+            <span class="value">${profile?.full_name || ''}</span>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="section">
+          <div class="row">
+            <span class="label">Farmer Name:</span>
+            <span class="value">${selectedFarmer?.name}</span>
+          </div>
+          <div class="row">
+            <span class="label">Village:</span>
+            <span class="value">${selectedFarmer?.village || '-'}</span>
+          </div>
+          <div class="row">
+            <span class="label">Phone:</span>
+            <span class="value">${selectedFarmer?.phone || '-'}</span>
+          </div>
+          <div class="row">
+            <span class="label">Date:</span>
+            <span class="value">${entry.entry_date}</span>
+          </div>
+          <div class="row">
+            <span class="label">Transaction Type:</span>
+            <span class="type-badge">${type?.label || entry.entry_type}</span>
+          </div>
+          ${entry.description ? `<div class="row"><span class="label">Description:</span><span class="value">${entry.description}</span></div>` : ''}
+        </div>
+
+        <div class="amount-box">
+          <div class="amount">₹${amt.toLocaleString('en-IN')}</div>
+          <div class="amount-label">${type?.isCredit ? 'Credit / ଉଧାର' : 'Recovery / ଆଦାୟ'}</div>
+        </div>
+
+        <div class="footer">
+          <div class="row">
+            <span class="label">Season:</span>
+            <span class="value">${season}</span>
+          </div>
+          <div class="row">
+            <span class="label">Generated:</span>
+            <span class="value">${new Date().toLocaleDateString('en-IN')}</span>
+          </div>
+        </div>
+
+        <div class="sign-area">
+          <div class="sign-line">Farmer Sign</div>
+          <div class="sign-line">Owner Sign</div>
+        </div>
+
+        <div style="text-align:center; margin-top:20px; font-size:10px; color:#999;">
+          Powered by NestNet · dealeros-platform.vercel.app
+        </div>
+      </body>
+      </html>
+    `
+    const win = window.open('', '_blank', 'width=500,height=700')
+    win.document.write(receiptHTML)
+    win.document.close()
+    win.print()
   }
 
   async function handleSave(e) {
@@ -380,7 +489,11 @@ export default function FarmerLedgerPage({ preSelectedFarmerId = null }) {
                             </span>
                             {/* Edit/Delete */}
                             <div className="flex items-center justify-end gap-1">
-                              <button onClick={() => openEdit(entry)}
+                            <button onClick={() => printReceipt(entry)}
+                          className="w-7 h-7 flex items-center justify-center rounded-lg bg-green-900/30 hover:bg-green-800/50 text-green-400 transition-all">
+                          <Printer className="w-3 h-3" />
+                          </button>
+                          <button onClick={() => openEdit(entry)}
                                 className="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-900/30 hover:bg-blue-800/50 text-blue-400 transition-all">
                                 <Pencil className="w-3 h-3" />
                               </button>
