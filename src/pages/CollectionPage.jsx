@@ -104,7 +104,7 @@ export default function CollectionPage() {
         await supabase.from('farmer_ledger').insert({
           farmer_id: form.farmer_id,
           dealer_id: profile?.dealer_id,
-          entry_type: 'credit',
+          entry_type: 'harvest_recovery',
           amount: totalAmount,
           description: `ଫସଲ ଆସିଲା — ${fish?.odia || form.fish_type} ${form.quantity_kg}kg @ ₹${form.rate_per_kg}`,
           entry_date: today,
