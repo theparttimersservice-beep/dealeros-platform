@@ -12,6 +12,8 @@ import BuyersPage from './BuyersPage'
 import CollectionPage from './CollectionPage'
 import FarmerLedgerPage from './FarmerLedgerPage'
 import CompanyLedgerPage from './CompanyLedgerPage'
+import SettingsPage from './SettingsPage'
+import { Settings } from 'lucide-react'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard',        odia: 'ଆଜିର ସ୍ଥିତି', id: 'dashboard' },
@@ -24,6 +26,7 @@ const menuItems = [
   { icon: Fish,            label: 'Harvest',          odia: 'ଫସଲ',          id: 'harvest' },
   { icon: BarChart3,       label: 'Reports',          odia: 'ରିପୋର୍ଟ',      id: 'reports' },
   { icon: Receipt,         label: 'Expenses',         odia: 'ଖର୍ଚ',         id: 'expenses' },
+  { icon: Settings,        label: 'Settings',         odia: 'ସେଟିଂ',       id: 'settings' },
 ]
 
 export default function Dashboard() {
@@ -285,9 +288,10 @@ export default function Dashboard() {
           {active === 'company-ledger' && <CompanyLedgerPage preSelectedCompanyId={selectedCompanyId} />}
           {active === 'collection'     && <CollectionPage />}
           {active === 'ledger'         && <FarmerLedgerPage preSelectedFarmerId={selectedFarmerId} />}
+          {active === 'settings'       && <SettingsPage />}
 
           {/* Coming soon */}
-          {!['dashboard','farmers','ledger','buyers','rates','collection','company-ledger'].includes(active) && (
+          {!['dashboard','farmers','ledger','buyers','rates','collection','company-ledger','settings'].includes(active) && (
             <div className="animate-fadeup flex items-center justify-center h-64">
               <div className="text-center">
                 <div className="w-16 h-16 bg-ocean-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
