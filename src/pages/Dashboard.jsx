@@ -12,20 +12,18 @@ import BuyersPage from './BuyersPage'
 import CollectionPage from './CollectionPage'
 import FarmerLedgerPage from './FarmerLedgerPage'
 import CompanyLedgerPage from './CompanyLedgerPage'
-import PaymentsPage from './PaymentsPage'
 
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', odia: 'ଆଜିର ସ୍ଥିତି', id: 'dashboard' },
-  { icon: Users, label: 'Farmers', odia: 'ଚାଷୀ', id: 'farmers' },
-  { icon: Users, label: 'Buyers/Clients', odia: 'ଖରିଦାର', id: 'buyers' },
-  { icon: BookOpen, label: 'Farmer Ledger', odia: 'ଚାଷୀ ଖାତା', id: 'ledger' },
-  { icon: TrendingUp, label: 'Daily Rate', odia: 'ଆଜିର ରେଟ', id: 'rates' },
-  { icon: Truck, label: 'Collection', odia: 'ସଂଗ୍ରହ', id: 'collection' },
-  { icon: Receipt, label: 'Payments', odia: 'ପେମେଣ୍ଟ', id: 'payments' },
-  { icon: Package, label: 'Stock & Materials', odia: 'ସ୍ଟକ', id: 'stock' },
-  { icon: Fish, label: 'Harvest', odia: 'ଫସଲ', id: 'harvest' },
-  { icon: BarChart3, label: 'Reports', odia: 'ରିପୋର୍ଟ', id: 'reports' },
-  { icon: Receipt, label: 'Expenses', odia: 'ଖର୍ଚ', id: 'expenses' },
+  { icon: LayoutDashboard, label: 'Dashboard',        odia: 'ଆଜିର ସ୍ଥିତି', id: 'dashboard' },
+  { icon: Users,           label: 'Farmers',          odia: 'ଚାଷୀ',         id: 'farmers' },
+  { icon: Users,           label: 'Buyers/Clients',   odia: 'ଖରିଦାର',       id: 'buyers' },
+  { icon: BookOpen,        label: 'Farmer Ledger',    odia: 'ଚାଷୀ ଖାତା',   id: 'ledger' },
+  { icon: TrendingUp,      label: 'Daily Rate',       odia: 'ଆଜିର ରେଟ',    id: 'rates' },
+  { icon: Truck,           label: 'Collection',       odia: 'ସଂଗ୍ରହ',       id: 'collection' },
+  { icon: Package,         label: 'Stock & Materials',odia: 'ସ୍ଟକ',         id: 'stock' },
+  { icon: Fish,            label: 'Harvest',          odia: 'ଫସଲ',          id: 'harvest' },
+  { icon: BarChart3,       label: 'Reports',          odia: 'ରିପୋର୍ଟ',      id: 'reports' },
+  { icon: Receipt,         label: 'Expenses',         odia: 'ଖର୍ଚ',         id: 'expenses' },
 ]
 
 export default function Dashboard() {
@@ -35,8 +33,11 @@ export default function Dashboard() {
   const [selectedCompanyId, setSelectedCompanyId] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [dashStats, setDashStats] = useState({
-    farmers: 0, buyers: 0, collection: 0,
-    totalDue: 0, totalReceived: 0, harvest: 0
+    farmers: 0,
+    buyers: 0,
+    collection: 0,
+    farmerOutstanding: 0,
+    buyerBalance: 0,
   })
 
   const today = new Date().toLocaleDateString('en-IN', {
@@ -50,37 +51,83 @@ export default function Dashboard() {
 
   async function fetchStats() {
     try {
-      const [farmers, buyers, collections, payments, harvests] = await Promise.all([
-        supabase.from('farmers').select('id', { count: 'exact' }).eq('dealer_id', profile?.dealer_id).eq('active', true),
-        supabase.from('buyers').select('id', { count: 'exact' }).eq('active', true),
-        supabase.from('collections').select('quantity_kg').eq('collection_date', todayISO),
-        supabase.from('payments').select('amount, payment_type'),
-        supabase.from('harvests').select('quantity').eq('harvest_date', todayISO),
+      const [farmersRes, buyersRes, collectionsRes, farmerLedgerRes, companyLedgerRes] = await Promise.all([
+
+        supabase
+          .from('farmers')
+          .select('id', { count: 'exact' })
+          .eq('dealer_id', profile?.dealer_id)
+          .eq('active', true),
+
+        supabase
+          .from('buyers')
+          .select('id', { count: 'exact' })
+          .eq('active', true),
+
+        supabase
+          .from('collections')
+          .select('quantity_kg')
+          .eq('collection_date', todayISO),
+
+        supabase
+          .from('farmer_ledger')
+          .select('entry_type, amount')
+          .eq('dealer_id', profile?.dealer_id),
+
+        supabase
+          .from('company_ledger')
+          .select('entry_type, amount'),
       ])
-      const todayKg = collections.data?.reduce((s, c) => s + (c.quantity_kg || 0), 0) || 0
-      const received = payments.data?.filter(p => p.payment_type === 'received').reduce((s, p) => s + (p.amount || 0), 0) || 0
-      const due = payments.data?.filter(p => p.payment_type === 'due').reduce((s, p) => s + (p.amount || 0), 0) || 0
-      const todayHarvest = harvests.data?.reduce((s, h) => s + (h.quantity || 0), 0) || 0
+
+      const todayKg = collectionsRes.data?.reduce((s, c) => s + (c.quantity_kg || 0), 0) || 0
+
+      const farmerCredit   = farmerLedgerRes.data?.filter(e => ['material', 'cash_advance'].includes(e.entry_type)).reduce((s, e) => s + (e.amount || 0), 0) || 0
+      const farmerRecovery = farmerLedgerRes.data?.filter(e => e.entry_type === 'harvest_recovery').reduce((s, e) => s + (e.amount || 0), 0) || 0
+      const farmerOutstanding = farmerCredit - farmerRecovery
+
+      const buyerDispatch = companyLedgerRes.data?.filter(e => e.entry_type === 'dispatch').reduce((s, e) => s + (e.amount || 0), 0) || 0
+      const buyerPayment  = companyLedgerRes.data?.filter(e => e.entry_type === 'payment_received').reduce((s, e) => s + (e.amount || 0), 0) || 0
+      const buyerBalance  = buyerDispatch - buyerPayment
+
       setDashStats({
-        farmers: farmers.count || 0,
-        buyers: buyers.count || 0,
+        farmers: farmersRes.count || 0,
+        buyers:  buyersRes.count  || 0,
         collection: todayKg,
-        totalDue: due,
-        totalReceived: received,
-        harvest: todayHarvest
+        farmerOutstanding,
+        buyerBalance,
       })
+
     } catch (e) {
       console.log('Stats fetch error', e)
     }
   }
 
   const statsCards = [
-    { label: 'Active Farmers', odia: 'ସକ୍ରିୟ ଚାଷୀ', value: dashStats.farmers, color: 'text-blue-400', bg: 'bg-blue-900/20', border: 'border-blue-800/40', icon: Users },
-    { label: 'Active Buyers', odia: 'ସକ୍ରିୟ ଖରିଦାର', value: dashStats.buyers, color: 'text-purple-400', bg: 'bg-purple-900/20', border: 'border-purple-800/40', icon: Users },
-    { label: "Today's Collection", odia: 'ଆଜିର ସଂଗ୍ରହ', value: dashStats.collection.toFixed(1) + ' kg', color: 'text-green-400', bg: 'bg-green-900/20', border: 'border-green-800/40', icon: Truck },
-    { label: 'Total Due', odia: 'ମୋଟ ବାକି', value: '₹' + dashStats.totalDue.toLocaleString('en-IN'), color: 'text-red-400', bg: 'bg-red-900/20', border: 'border-red-800/40', icon: TrendingDown },
-    { label: 'Total Received', odia: 'ମୋଟ ଆସିଲା', value: '₹' + dashStats.totalReceived.toLocaleString('en-IN'), color: 'text-emerald-400', bg: 'bg-emerald-900/20', border: 'border-emerald-800/40', icon: TrendingUp },
-    { label: "Today's Harvest", odia: 'ଆଜିର ଫସଲ', value: dashStats.harvest + ' kg', color: 'text-orange-400', bg: 'bg-orange-900/20', border: 'border-orange-800/40', icon: Fish },
+    {
+      label: 'Active Farmers', odia: 'ସକ୍ରିୟ ଚାଷୀ',
+      value: dashStats.farmers,
+      color: 'text-blue-400', bg: 'bg-blue-900/20', border: 'border-blue-800/40', icon: Users
+    },
+    {
+      label: 'Active Buyers', odia: 'ସକ୍ରିୟ ଖରିଦାର',
+      value: dashStats.buyers,
+      color: 'text-purple-400', bg: 'bg-purple-900/20', border: 'border-purple-800/40', icon: Users
+    },
+    {
+      label: "Today's Collection", odia: 'ଆଜିର ସଂଗ୍ରହ',
+      value: dashStats.collection.toFixed(1) + ' kg',
+      color: 'text-green-400', bg: 'bg-green-900/20', border: 'border-green-800/40', icon: Truck
+    },
+    {
+      label: 'Farmer Outstanding', odia: 'ଚାଷୀ ବାକି ରାଶି',
+      value: '₹' + dashStats.farmerOutstanding.toLocaleString('en-IN'),
+      color: 'text-red-400', bg: 'bg-red-900/20', border: 'border-red-800/40', icon: TrendingDown
+    },
+    {
+      label: 'Buyer Balance Due', odia: 'ଖରିଦାର ବାକି ରାଶି',
+      value: '₹' + dashStats.buyerBalance.toLocaleString('en-IN'),
+      color: 'text-emerald-400', bg: 'bg-emerald-900/20', border: 'border-emerald-800/40', icon: TrendingUp
+    },
   ]
 
   return (
@@ -204,12 +251,11 @@ export default function Dashboard() {
               {/* Quick Actions */}
               <div>
                 <h2 className="text-ocean-300 text-sm font-semibold mb-3 odia">⚡ ଶୀଘ୍ର କାର୍ଯ୍ୟ / Quick Actions</h2>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                   {[
-                    { label: 'Add Farmer', odia: 'ଚାଷୀ ଯୋଗ କରନ୍ତୁ', icon: Users, id: 'farmers', color: 'text-blue-400' },
-                    { label: 'Daily Rate', odia: 'ଆଜିର ରେଟ ଦିଅନ୍ତୁ', icon: TrendingUp, id: 'rates', color: 'text-green-400' },
-                    { label: 'New Collection', odia: 'ନୂଆ ସଂଗ୍ରହ', icon: Truck, id: 'collection', color: 'text-orange-400' },
-                    { label: 'Add Payment', odia: 'ପେମେଣ୍ଟ ଯୋଗ', icon: Receipt, id: 'payments', color: 'text-purple-400' },
+                    { label: 'Add Farmer',     odia: 'ଚାଷୀ ଯୋଗ କରନ୍ତୁ',  icon: Users,      id: 'farmers',    color: 'text-blue-400' },
+                    { label: 'Daily Rate',     odia: 'ଆଜିର ରେଟ ଦିଅନ୍ତୁ', icon: TrendingUp, id: 'rates',      color: 'text-green-400' },
+                    { label: 'New Collection', odia: 'ନୂଆ ସଂଗ୍ରହ',        icon: Truck,      id: 'collection', color: 'text-orange-400' },
                   ].map((action, i) => (
                     <button key={i} onClick={() => setActive(action.id)}
                       className="card p-4 hover:bg-ocean-800 transition-all text-left border-ocean-700 group rounded-2xl">
@@ -221,7 +267,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* NestNet Info */}
+              {/* Info banner */}
               <div className="card p-5 border-blue-800/30 bg-blue-900/10 rounded-2xl">
                 <div className="flex items-center gap-3 mb-2">
                   <Waves className="w-5 h-5 text-blue-400" />
@@ -233,15 +279,15 @@ export default function Dashboard() {
             </div>
           )}
 
-          {active === 'farmers' && <FarmersPage onViewLedger={(id) => { setSelectedFarmerId(id); setActive('ledger') }} />}
-          {active === 'rates' && <DailyRatePage />}
-          {active === 'buyers' && <BuyersPage onViewLedger={(id) => { setSelectedCompanyId(id); setActive('company-ledger') }} />}
+          {active === 'farmers'        && <FarmersPage onViewLedger={(id) => { setSelectedFarmerId(id); setActive('ledger') }} />}
+          {active === 'rates'          && <DailyRatePage />}
+          {active === 'buyers'         && <BuyersPage onViewLedger={(id) => { setSelectedCompanyId(id); setActive('company-ledger') }} />}
           {active === 'company-ledger' && <CompanyLedgerPage preSelectedCompanyId={selectedCompanyId} />}
-          {active === 'collection' && <CollectionPage />}
-          {active === 'payments' && <PaymentsPage />}
-          {active === 'ledger' && <FarmerLedgerPage preSelectedFarmerId={selectedFarmerId} />}
+          {active === 'collection'     && <CollectionPage />}
+          {active === 'ledger'         && <FarmerLedgerPage preSelectedFarmerId={selectedFarmerId} />}
 
-          {active !== 'dashboard' && active !== 'farmers' && active !== 'ledger' && active !== 'buyers' && active !== 'rates' && active !== 'collection' && active !== 'payments' && active !== 'company-ledger' && active !== 'company-ledger' && (
+          {/* Coming soon */}
+          {!['dashboard','farmers','ledger','buyers','rates','collection','company-ledger'].includes(active) && (
             <div className="animate-fadeup flex items-center justify-center h-64">
               <div className="text-center">
                 <div className="w-16 h-16 bg-ocean-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
