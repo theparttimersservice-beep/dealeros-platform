@@ -14,11 +14,13 @@ export function AuthProvider({ children }) {
       if (session?.user) fetchProfile(session.user.id)
       else setLoading(false)
     })
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) fetchProfile(session.user.id)
       else { setProfile(null); setLoading(false) }
     })
+
     return () => subscription.unsubscribe()
   }, [])
 
@@ -47,13 +49,15 @@ export function AuthProvider({ children }) {
     // Step 1: Create auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({ email, password })
     if (authError) throw authError
+
     const userId = authData.user.id
 
-    // Step 2: Create user profile (no dealers table)
+    // Step 2: Create user profile
     const { error: profileError } = await supabase
       .from('users')
       .insert({
         id: userId,
+        dealer_id: userId,
         full_name: fullName,
         business_name: businessName,
         phone: phone,
