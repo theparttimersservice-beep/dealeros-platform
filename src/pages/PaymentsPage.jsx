@@ -22,9 +22,9 @@ export default function PaymentsPage() {
   async function fetchAll() {
     setLoading(true)
     const [pay, far, buy] = await Promise.all([
-      supabase.from('payments').select('*, farmers(name), buyers(name)').order('created_at', { ascending: false }).limit(50),
+      supabase.from('payments').select('*, farmers(name), buyers(name)').eq('dealer_id', profile?.dealer_id).order('created_at', { ascending: false }).limit(50),
       supabase.from('farmers').select('id, name').eq('dealer_id', profile?.dealer_id).eq('active', true),
-      supabase.from('buyers').select('id, name').eq('active', true),
+      supabase.from('buyers').select('id, name').eq('dealer_id', profile?.dealer_id).eq('active', true),
     ])
     if (pay.data) setPayments(pay.data)
     if (far.data) setFarmers(far.data)
@@ -40,7 +40,8 @@ export default function PaymentsPage() {
     setSaving(true)
     const { error } = await supabase.from('payments').insert({
       farmer_id: form.farmer_id || null,
-      dealer_id: form.buyer_id || null,
+      company_id: form.buyer_id || null,
+      dealer_id: profile?.dealer_id,
       payment_type: form.payment_type,
       amount: parseFloat(form.amount),
       payment_mode: form.payment_mode,
