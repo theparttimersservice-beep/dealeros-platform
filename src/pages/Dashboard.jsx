@@ -66,11 +66,13 @@ export default function Dashboard() {
         supabase
           .from('buyers')
           .select('id', { count: 'exact' })
+          .eq('dealer_id', profile?.dealer_id)
           .eq('active', true),
 
         supabase
           .from('collections')
           .select('quantity_kg')
+          .eq('dealer_id', profile?.dealer_id)
           .eq('collection_date', todayISO),
 
         supabase
@@ -80,7 +82,8 @@ export default function Dashboard() {
 
         supabase
           .from('company_ledger')
-          .select('entry_type, amount'),
+          .select('entry_type, amount')
+          .eq('dealer_id', profile?.dealer_id),
       ])
 
       const todayKg = collectionsRes.data?.reduce((s, c) => s + (c.quantity_kg || 0), 0) || 0
