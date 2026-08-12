@@ -26,13 +26,14 @@ export default function DailyRatePage() {
   const today = new Date().toISOString().split('T')[0]
 
   useEffect(() => {
-    fetchTodayRates()
-  }, [])
+    if (profile) fetchTodayRates()
+  }, [profile])
 
   async function fetchTodayRates() {
     const { data } = await supabase
       .from('daily_rates')
       .select('*')
+      .eq('dealer_id', profile?.dealer_id)
       .eq('rate_date', today)
       .order('fish_type')
     if (data) {
@@ -58,6 +59,7 @@ export default function DailyRatePage() {
             fish_type: fish.id,
             rate_per_kg: val,
             rate_date: today,
+            dealer_id: profile?.dealer_id,
           })
         }
       }
