@@ -53,7 +53,7 @@ export function AuthProvider({ children }) {
     const userId = authData.user.id
 
     // Step 2: Create user profile
-    const { error: profileError } = await supabase
+    const { data: newProfile, error: profileError } = await supabase
       .from('users')
       .insert({
         id: userId,
@@ -65,7 +65,12 @@ export function AuthProvider({ children }) {
         state: state || 'Odisha',
         role: 'owner'
       })
+      .select()
+      .single()
     if (profileError) throw profileError
+
+    setUser(authData.user)
+    setProfile(newProfile)
 
     return authData
   }
