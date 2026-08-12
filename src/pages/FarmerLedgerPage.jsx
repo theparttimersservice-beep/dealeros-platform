@@ -66,6 +66,7 @@ export default function FarmerLedgerPage({ preSelectedFarmerId = null }) {
     setLoading(true)
     const { data } = await supabase
       .from('farmer_ledger').select('*')
+      .eq('dealer_id', profile?.dealer_id)
       .eq('farmer_id', farmerId)
       .eq('season', season)
       .order('entry_date', { ascending: true })
