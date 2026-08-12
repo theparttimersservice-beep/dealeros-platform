@@ -24,19 +24,30 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  async function fetchProfile(userId) {
+  async function fetchProfile(userId, attempt = 1) {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('users')
         .select('*')
         .eq('id', userId)
         .single()
-      if (data) setProfile(data)
+      if (data) {
+        setProfile(data)
+        setLoading(false)
+        return
+      }
+      if (error && attempt < 4) {
+        setTimeout(() => fetchProfile(userId, attempt + 1), 600)
+        return
+      }
     } catch (e) {
-      console.log('Profile not found yet')
-    } finally {
-      setLoading(false)
+      if (attempt < 4) {
+        setTimeout(() => fetchProfile(userId, attempt + 1), 600)
+        return
+      }
+      console.log('Profile not found after retries')
     }
+    setLoading(false)
   }
 
   async function login(email, password) {
