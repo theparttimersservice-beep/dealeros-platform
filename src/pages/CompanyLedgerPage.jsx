@@ -65,6 +65,7 @@ export default function CompanyLedgerPage({ preSelectedCompanyId = null }) {
     setLoading(true)
     const { data } = await supabase
       .from('company_ledger').select('*')
+      .eq('dealer_id', profile.dealer_id)
       .eq('company_id', companyId)
       .eq('season', season)
       .order('entry_date', { ascending: true })
