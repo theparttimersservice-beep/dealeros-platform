@@ -45,9 +45,9 @@ export default function CollectionPage() {
   async function fetchAll() {
     setLoading(true)
     const [col, far, rates] = await Promise.all([
-      supabase.from('collections').select('*, farmers(name, village)').eq('collection_date', today).order('created_at', { ascending: false }),
+      supabase.from('collections').select('*, farmers(name, village)').eq('dealer_id', profile?.dealer_id).eq('collection_date', today).order('created_at', { ascending: false }),
       supabase.from('farmers').select('id, name, village').eq('dealer_id', profile?.dealer_id).eq('active', true),
-      supabase.from('daily_rates').select('*').eq('rate_date', today)
+      supabase.from('daily_rates').select('*').eq('dealer_id', profile?.dealer_id).eq('rate_date', today)
     ])
     if (col.data) setCollections(col.data)
     if (far.data) setFarmers(far.data)
@@ -86,6 +86,7 @@ export default function CollectionPage() {
     setSaving(true)
     const { data: colData, error } = await supabase.from('collections').insert({
       farmer_id: form.farmer_id || null,
+      dealer_id: profile?.dealer_id,
       village: form.village,
       fish_type: form.fish_type,
       quantity_kg: parseFloat(form.quantity_kg),
