@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
         .select('*')
         .eq('id', userId)
         .single()
-      setProfile(data)
+      if (data) setProfile(data)
     } catch (e) {
       console.log('Profile not found yet')
     } finally {
