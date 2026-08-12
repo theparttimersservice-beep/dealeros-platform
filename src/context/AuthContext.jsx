@@ -14,13 +14,11 @@ export function AuthProvider({ children }) {
       if (session?.user) fetchProfile(session.user.id)
       else setLoading(false)
     })
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) fetchProfile(session.user.id)
       else { setProfile(null); setLoading(false) }
     })
-
     return () => subscription.unsubscribe()
   }, [])
 
@@ -60,10 +58,23 @@ export function AuthProvider({ children }) {
     // Step 1: Create auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({ email, password })
     if (authError) throw authError
-
     const userId = authData.user.id
 
-    // Step 2: Create user profile
+    // Step 2: Create dealer record first (users.dealer_id is a FK to dealers.id)
+    // dealers table requires: name (NOT NULL), owner_name (NOT NULL)
+    const { error: dealerError } = await supabase
+      .from('dealers')
+      .insert({
+        id: userId,
+        name: businessName,
+        owner_name: fullName,
+        phone: phone,
+        city: city,
+        state: state || 'Odisha'
+      })
+    if (dealerError) throw dealerError
+
+    // Step 3: Create user profile (now dealer_id FK will resolve fine)
     const { data: newProfile, error: profileError } = await supabase
       .from('users')
       .insert({
@@ -82,7 +93,6 @@ export function AuthProvider({ children }) {
 
     setUser(authData.user)
     setProfile(newProfile)
-
     return authData
   }
 
